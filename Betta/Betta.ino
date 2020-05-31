@@ -64,7 +64,7 @@ void loop() {
   x += speedX;
   y += speedY;
 
-  M5.Lcd.drawJpgFile(SD, "/beta.jpeg", x, y);
+  M5.Lcd.drawJpgFile(SD, "/Betta.jpeg", x, y);
   delay(100);
 
 }
