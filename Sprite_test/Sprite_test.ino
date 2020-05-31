@@ -28,17 +28,10 @@
 // Set delay after plotting the sprite
 #define DELAY 1000
 
-// Width and height of sprite
-#define WIDTH  128
-#define HEIGHT 128
-
-
 #include <M5Stack.h>
+
 #include "bitmap.h"
 
-#define TRANSP (uint16_t)0xFFFE
-
-TFT_eSprite spr = TFT_eSprite(&M5.Lcd);
 TFT_eSprite betta_spr = TFT_eSprite(&M5.Lcd);
 
 void setup()
@@ -52,8 +45,7 @@ void setup()
   // spr.setColorDepth(8);
 
   // Create a sprite of defined size
-  spr.createSprite(WIDTH, HEIGHT);
-  betta_spr.createSprite(WIDTH, HEIGHT);
+  betta_spr.createSprite(Betta_width, Betta_height);
 
   // Clear the TFT screen to blue
   M5.Lcd.fillScreen(TFT_BLUE);
@@ -62,7 +54,6 @@ void setup()
 void loop(void)
 {
   // Fill the whole sprite with black (Sprite is in memory so not visible yet)
-  spr.fillSprite(TFT_BLACK);
 
  // Number of pixels to draw
 // uint16_t n = 40;
@@ -77,28 +68,14 @@ void loop(void)
 //  }
 
   // Draw some lines
-  spr.drawLine(1, 0, WIDTH, HEIGHT-1, TFT_GREEN);
-  spr.drawLine(0, 0, WIDTH, HEIGHT, TFT_GREEN);
-  spr.drawLine(0, 1, WIDTH-1, HEIGHT, TFT_GREEN);
-  spr.drawLine(0, HEIGHT-1, WIDTH-1, 0, TFT_RED);
-  spr.drawLine(0, HEIGHT, WIDTH, 0, TFT_RED);
-  spr.drawLine(1, HEIGHT, WIDTH, 1, TFT_RED);
 
   // Draw some text with Middle Centre datum
-  spr.setTextDatum(MC_DATUM);
-  spr.drawString("fish", WIDTH / 2, HEIGHT / 2, 4);
 
   betta_spr.pushImage(0, 0, Betta_width, Betta_height, Betta_bits);
 
 
   // Now push the sprite to the TFT at position 0,0 on screen
-  spr.pushSprite(-40, -40);
-  spr.pushSprite(M5.Lcd.width() / 2 - WIDTH / 2, M5.Lcd.height() / 2 - HEIGHT / 2);
-  spr.pushSprite(M5.Lcd.width() - WIDTH + 40, M5.Lcd.height() - HEIGHT + 40);
-
-  betta_spr.pushSprite(-40, -40);
   betta_spr.pushSprite(M5.Lcd.width() / 2 - Betta_width / 2, M5.Lcd.height() / 2 - Betta_height / 2);
-  betta_spr.pushSprite(M5.Lcd.width() - Betta_width + 40, M5.Lcd.height() - Betta_height + 40);
 
   delay(DELAY);
 
@@ -107,10 +84,9 @@ void loop(void)
 
   // Draw a blue rectangle in sprite so when we move it 1 pixel it does not leave a trail
   // on the blue screen background
-  spr.drawRect(0, 0, WIDTH, HEIGHT, TFT_BLUE);
   betta_spr.drawRect(0, 0, Betta_width, Betta_height, TFT_BLUE);
-  int x = M5.Lcd.width() / 2  -  WIDTH / 2;
-  int y = M5.Lcd.height() / 2 - HEIGHT / 2;
+  int x = M5.Lcd.width() / 2  -  Betta_width / 2;
+  int y = M5.Lcd.height() / 2 - Betta_height / 2;
 
   uint32_t updateTime = 0;       // time for next update
 
@@ -121,10 +97,10 @@ void loop(void)
     int dy = 1; if (random(2)) dy = -1;
 
     // Pull it back onto screen if it wanders off
-    if (x < -WIDTH/2) dx = 1;
-    if (x >= M5.Lcd.width()-WIDTH/2) dx = -1;
-    if (y < -HEIGHT/2) dy = 1;
-    if (y >= M5.Lcd.height()-HEIGHT/2) dy = -1;
+    if (x < -Betta_width/2) dx = 1;
+    if (x >= M5.Lcd.width()-Betta_width/2) dx = -1;
+    if (y < -Betta_height/2) dy = 1;
+    if (y >= M5.Lcd.height()-Betta_height/2) dy = -1;
 
     // Draw it 50 time, moving in random direct or staying still
     int n = 50;
@@ -137,8 +113,7 @@ void loop(void)
         updateTime = millis() + wait;
 
         // Push the sprite to the TFT screen
-        spr.pushSprite(x, y);
-        betta_spr.pushSprite(x-20, y-20);
+        betta_spr.pushSprite(x, y);
 
         // Change coord for next loop
         x += dx;
