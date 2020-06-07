@@ -1,31 +1,3 @@
-/*
-
-  Sketch to show how a Sprite is created, how to draw pixels
-  and text within the Sprite and then push the Sprite onto
-  the display screen.
-
-  Example for library:
-  https://github.com/Bodmer/TFT_eSPI
-
-  A Sprite is notionally an invisible graphics screen that is
-  kept in the processors RAM. Graphics can be drawn into the
-  Sprite just as it can be drawn directly to the screen. Once
-  the Sprite is completed it can be plotted onto the screen in
-  any position. If there is sufficient RAM then the Sprite can
-  be the same size as the screen and used as a frame buffer.
-
-  A 16 bit Sprite occupies (2 * width * height) bytes in RAM.
-
-  On a ESP8266 Sprite sizes up to 126 x 160 can be accomodated,
-  this size requires 40kBytes of RAM for a 16 bit colour depth.
-
-  When 8 bit colour depth sprites are created they occupy
-  (width * height) bytes in RAM, so larger sprites can be
-  created, or the RAM required is halved.
-
-*/
-
-// Set delay after plotting the sprite
 #define DELAY 1000
 
 #include <M5Stack.h>
@@ -39,13 +11,11 @@ void setup()
   Serial.begin(250000);
   Serial.println();
 
-  // Initialise the TFT registers
   M5.begin();
-  // Optionally set colour depth to 8 or 16 bits, default is 16 if not spedified
-  // spr.setColorDepth(8);
 
-  // Create a sprite of defined size
   betta_spr.createSprite(Betta_width, Betta_height);
+  betta_spr.setColorDepth(16);
+  betta_spr.pushImage(0, 0, Betta_width, Betta_height, Betta_bits);
 
   // Clear the TFT screen to blue
   M5.Lcd.fillScreen(TFT_BLUE);
@@ -53,74 +23,9 @@ void setup()
 
 void loop(void)
 {
-  // Fill the whole sprite with black (Sprite is in memory so not visible yet)
+   M5.Lcd.fillScreen(TFT_BLUE);
 
- // Number of pixels to draw
-// uint16_t n = 40;
-//
-//  // Draw 100 random colour pixels at random positions in sprite
-//  while (n--)
-//  {
-//    uint16_t colour = random(0x10000); // Returns colour 0 - 0xFFFF
-//    int16_t x = random(WIDTH);        // Random x coordinate
-//    int16_t y = random(HEIGHT);       // Random y coordinate
-//    spr.drawPixel( x, y, colour);      // Draw pixel in sprite
-//  }
-
-  // Draw some lines
-
-  // Draw some text with Middle Centre datum
-
-  betta_spr.pushImage(0, 0, Betta_width, Betta_height, Betta_bits);
-
-
-  // Now push the sprite to the TFT at position 0,0 on screen
-  betta_spr.pushSprite(M5.Lcd.width() / 2 - Betta_width / 2, M5.Lcd.height() / 2 - Betta_height / 2);
+  betta_spr.pushSprite(160, 120);
 
   delay(DELAY);
-
-  // Fill TFT screen with blue
-  M5.Lcd.fillScreen(TFT_BLUE);
-
-  // Draw a blue rectangle in sprite so when we move it 1 pixel it does not leave a trail
-  // on the blue screen background
-  betta_spr.drawRect(0, 0, Betta_width, Betta_height, TFT_BLUE);
-  int x = M5.Lcd.width() / 2  -  Betta_width / 2;
-  int y = M5.Lcd.height() / 2 - Betta_height / 2;
-
-  uint32_t updateTime = 0;       // time for next update
-
-  while (true)
-  {
-    // Random movement direction
-    int dx = 1; if (random(2)) dx = -1;
-    int dy = 1; if (random(2)) dy = -1;
-
-    // Pull it back onto screen if it wanders off
-    if (x < -Betta_width/2) dx = 1;
-    if (x >= M5.Lcd.width()-Betta_width/2) dx = -1;
-    if (y < -Betta_height/2) dy = 1;
-    if (y >= M5.Lcd.height()-Betta_height/2) dy = -1;
-
-    // Draw it 50 time, moving in random direct or staying still
-    int n = 50;
-    int wait = random (50);
-    while (n)
-    {
-      if (updateTime <= millis())
-      {
-        // Use time delay so sprtie does not move fast when not all on screen
-        updateTime = millis() + wait;
-
-        // Push the sprite to the TFT screen
-        betta_spr.pushSprite(x, y);
-
-        // Change coord for next loop
-        x += dx;
-        y += dy;
-        n--;
-        yield(); // Stop watchdog reset
-      }
-    }
-  } // Infinite while, will not exit!
 }
